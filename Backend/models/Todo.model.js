@@ -6,8 +6,8 @@ const TodoSchema = new mongoose.Schema({
         reqiured: true
     },
     status:{
-        type : String,
-        default: "pending"
+        type : Boolean,
+        default: false
     }
 },
 {timestamps:true}

@@ -28,7 +28,6 @@ setText(e.target.value)
             onChange={(e)=>onInputChange(e)}
             value={text}
             required
-            pattern='[\S\s]{6,}'
         />
         <button className='mx-5 border p-3 my-5 bg-red-600 rounded-md border-[black]' type="submit">
             Add
