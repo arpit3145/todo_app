@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ADDNEW_TODO, GETALL_TODO,UPDATE_TODO, DELETE_TODO, TOGGLE_TODO } from "./type";
-
+import { toast } from "react-toastify";
 
 const API_URL = 'http://localhost:8000';
 
@@ -9,7 +9,9 @@ export const addNewTodo =(description)=> async(dispatch) =>{
     const res = await axios.post(`${API_URL}/todos`,{description});
 
     dispatch({type : ADDNEW_TODO ,payload: res.data})
+    
     }catch(error){
+        toast.error(error.response.data.message)
         console.log('Error while calling addNewTodo API', error.message)
         
     }

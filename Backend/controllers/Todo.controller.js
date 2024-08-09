@@ -1,70 +1,91 @@
-import TodoModel from "../models/Todo.model.js" 
+import TodoModel from "../models/Todo.model.js";
+import client from "../cilent.js";
+export const addTodo = async (req, res) => {
+  try {
+    const { description, status } = req.body;
+    const trimDescription = description.trim();
+    const existdDescription = await TodoModel.findOne({description:trimDescription})
+    
 
-export const addTodo = async(req, res)=>{
-    try {
-        const{description, status} = req.body
-//         if(description.trim() === ""){
-// res.status(400).json({message:"field is required"})
-//         }
-        const newTodo = await TodoModel.create({
-            description : description
-        })
-        await newTodo.save()
+    if (trimDescription === "") {
+      res.status(400).json({ message: "field is required" });
+    }else if(existdDescription){
+        res.status(400).json({ message: "Task is already exist" });  
+    }else{ 
 
-        return res.status(200).json(newTodo)
-    } catch (error) {
-        return res.status(500).json(error.message)
-    }
+    const newTodo = await TodoModel.create({
+      description: trimDescription,
+    });
+
+    await newTodo.save();
+
+    return res.status(200).json(newTodo);
 }
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+};
 
-export const getAllTodos = async(req,res)=>{
-    try{
-        const todos = await TodoModel.find()
+export const getAllTodos = async (req, res) => {
+  try {
 
-        if(todos.length ===0){
-            return res.status(404).json({message:"No Todo Found"})
-        }
-        res.status(200).json(todos)
-    }catch(error){
-        return res.status(500).json(error.message)
+    const cacheKey = 'all_todos';
+    const cachedTodos = await client.get(cacheKey);
+
+    if (cachedTodos) {
+      return res.status(200).json(JSON.parse(cachedTodos));
     }
-}
 
-export const updateTodo = async(req,res)=>{
-    try{
-         await TodoModel.findOneAndUpdate(
-            {_id: req.params.id},
-            {description: req.body.description}
-        )
-const  todo = await TodoModel.findById(req.params.id)
-return res.status(200).json(todo)
-    }catch(error){
-        return res.status(500).json(error.message)
+    const todos = await TodoModel.find().sort({'createdAt': -1});
+
+    if (todos.length === 0) {
+      return res.status(404).json({ message: "No Todo Found" });
     }
-}
 
-export const deleteTodo = async(req,res)=>{
-    try{
-       const todo = await TodoModel.findByIdAndDelete(req.params.id)
-         return res.status(200).json(todo)
-    }catch(error){
-        return res.status(500).json(error.message)
-    }
-}
+    await client.set(cacheKey, JSON.stringify(todos), {
+      EX: 3600, 
+    });
 
+    res.status(200).json(todos);
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+};
 
-export const toggleTodoDone = async(req,res)=>{
-    try{
-        const todos = await TodoModel.findById(req.params.id)
+export const updateTodo = async (req, res) => {
+  try {
+    await TodoModel.findOneAndUpdate(
+      { _id: req.params.id },
+      { description: req.body.description }
+    );
+    const todo = await TodoModel.findById(req.params.id);
+    return res.status(200).json(todo);
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+};
 
-       const todo = await TodoModel.findOneAndUpdate(
-            {_id: req.params.id},
-            {status: !todos.status}
-        )
-       await todo.save();
+export const deleteTodo = async (req, res) => {
+  try {
+    const todo = await TodoModel.findByIdAndDelete(req.params.id);
+    return res.status(200).json(todo);
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+};
 
-        res.status(200).json(todo)
-    }catch(error){
-        return res.status(500).json(error.message)
-    }
-}
+export const toggleTodoDone = async (req, res) => {
+  try {
+    const todos = await TodoModel.findById(req.params.id);
+
+    const todo = await TodoModel.findOneAndUpdate(
+      { _id: req.params.id },
+      { status: !todos.status }
+    );
+    await todo.save();
+
+    res.status(200).json(todo);
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+};

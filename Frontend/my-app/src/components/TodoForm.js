@@ -21,7 +21,7 @@ setText(e.target.value)
 
   return (
     
-    <form onSubmit={onFromSubmit} className='flex'>
+    <form onSubmit={onFromSubmit} className='md:flex'>
         <input
             placeholder='Enter new Todo'
             className='text-center w-full border-[3px] rounded-md text-[20px] my-5 p-3 outline-none border-[#eded72]'
@@ -29,7 +29,7 @@ setText(e.target.value)
             value={text}
             required
         />
-        <button className='mx-5 border p-3 my-5 bg-red-600 rounded-md border-[black]' type="submit">
+        <button className='md:mx-5 border p-3 my-5 bg-red-600 rounded-md border-[black] md:w-[30%] w-full ' type="submit">
             Add
         </button>
     </form>

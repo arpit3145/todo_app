@@ -9,7 +9,6 @@ const connectDB =async(MONGO_DB_URL)=>{
         console.log('connected successfully...')
     }catch(error){
         console.log(error)
-        console.log(process.exit(1))
         process.exit(1)
         
     }

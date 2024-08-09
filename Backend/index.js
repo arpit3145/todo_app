@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./src/db/connectdb.js";
 import route from "./routes/route.js";
 import bodyParser from "body-parser";
+import client from "./cilent.js";
 dotenv.config({
     path:"./.env"
 })
@@ -12,6 +13,8 @@ dotenv.config({
 const app = express()
 const port = process.env.PORT || 8000
 const DATABASE_URL = process.env.MONGO_DB
+
+
 
 // cors policy
 app.use(cors())
